@@ -1,0 +1,37 @@
+motoMinder/
+├── server/                  # Backend Express.js code
+│   ├── app.js               # Main Express app
+│   ├── db/                  # Database-related files
+│   │   └── init.js          # Database initialization
+│   └── routes/              # API routes
+│       ├── garages.js
+│       ├── bikes.js
+│       ├── sections.js
+│       ├── parts.js
+│       ├── tags.js
+│       ├── maintenance.js
+│       └── search.js
+│
+├── public/                  # Frontend assets and code
+│   ├── index.html           # Entry point HTML
+│   ├── css/                 # CSS files
+│   │   ├── styles.css       # Main stylesheet
+│   │   └── normalize.css    # CSS reset
+│   ├── js/                  # JavaScript files
+│   │   ├── app.js           # Main application code
+│   │   ├── api.js           # API client
+│   │   ├── components/      # Reusable Alpine.js components
+│   │   │   ├── header.js
+│   │   │   ├── sidebar.js
+│   │   │   ├── tags.js
+│   │   │   └── ...
+│   │   └── views/           # Page-specific Alpine.js code
+│   │       ├── dashboard.js
+│   │       ├── garages.js
+│   │       ├── bikes.js
+│   │       ├── parts.js
+│   │       └── ...
+│   └── img/                 # Image assets
+│
+├── package.json             # Project dependencies
+└── README.md                # Project documentation

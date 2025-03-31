@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MotoMinder - Motorcycle Management</title>
+  
+  <!-- Alpine.js -->
+  <script defer src="https://unpkg.com/alpinejs@3.10.3/dist/cdn.min.js"></script>
+  
+  <!-- Font Awesome Icons (Free Version) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body x-data="app()">
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <h1>MotoMinder</h1>
+      </div>
+      <div class="search-container">
+        <div class="search-bar">
+          <i class="fas fa-search search-icon"></i>
+          <input 
+            type="text" 
+            placeholder="Search bikes, parts, or tags..." 
+            x-model="searchQuery"
+            @keyup.enter="performSearch">
+        </div>
+      </div>
+      <div class="user-menu">
+        <div class="user-avatar">ME</div>
+      </div>
+    </header>
+
+    <div class="main-container">
+      <!-- Sidebar -->
+      <aside class="sidebar" x-show="!isMobile || (isMobile && showSidebar)" x-transition>
+        <nav class="main-nav">
+          <ul>
+            <li>
+              <a href="#" 
+                 @click.prevent="navigateTo('dashboard')" 
+                 :class="{'active': currentView === 'dashboard'}">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+              </a>
+            </li>
+            <li>
+              <a href="#" 
+                 @click.prevent="navigateTo('garages')" 
+                 :class="{'active': currentView === 'garages'}">
+                <i class="fas fa-warehouse"></i> Garages
+              </a>
+            </li>
+            <li>
+              <a href="#" 
+                 @click.prevent="navigateTo('bikes')" 
+                 :class="{'active': currentView === 'bikes'}">
+                <i class="fas fa-motorcycle"></i> All Bikes
+              </a>
+            </li>
+            <li>
+              <a href="#" 
+                 @click.prevent="navigateTo('maintenance')" 
+                 :class="{'active': currentView === 'maintenance'}">
+                <i class="fas fa-tools"></i> Maintenance
+              </a>
+            </li>
+            <li>
+              <a href="#" 
+                 @click.prevent="navigateTo('tags')" 
+                 :class="{'active': currentView === 'tags'}">
+                <i class="fas fa-tags"></i> Tags
+              </a>
+            </li>
+          </ul>
+        </nav>
+        
+        <div class="divider"></div>
+        
+        <div class="sidebar-section" x-data="{ expanded: true }">
+          <div class="sidebar-heading" @click="expanded = !expanded">
+            <h3>MY GARAGES</h3>
+            <i class="fas" :class="expanded ? 'fa-chevron-down' : 'fa-chevron-right'"></i>
+          </div>
+          <ul x-show="expanded" x-transition>
+            <template x-for="garage in garages" :key="garage.id">
+              <li>
+                <a href="#" @click.prevent="viewGarage(garage.id)" x-text="garage.name"></a>
+              </li>
+            </template>
+          </ul>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <div class="sidebar-section" x-data="{ expanded: true }">
+          <div class="sidebar-heading" @click="expanded = !expanded">
+            <h3>MY BIKES</h3>
+            <i class="fas" :class="expanded ? 'fa-chevron-down' : 'fa-chevron-right'"></i>
+          </div>
+          <ul x-show="expanded" x-transition>
+            <template x-for="bike in bikes" :key="bike.id">
+              <li>
+                <a href="#" @click.prevent="viewBike(bike.id)" x-text="bike.make + ' ' + bike.model"></a>
+              </li>
+            </template>
+          </ul>
+        </div>
+      </aside>
+
+      <!-- Mobile menu toggle -->
+      <button 
+        class="mobile-menu-toggle" 
+        x-show="isMobile" 
+        @click="showSidebar = !showSidebar"
+        :aria-expanded="showSidebar">
+        <i class="fas" :class="showSidebar ? 'fa-times' : 'fa-bars'"></i>
+      </button>
+
+      <!-- Main content -->
+      <main class="content">
+        <!-- Dashboard View -->
+        <div id="dashboard-view" x-show="currentView === 'dashboard'" x-transition>
+          <div x-data="dashboardView()"></div>
+        </div>
+        
+        <!-- Garages View -->
+        <div id="garages-view" x-show="currentView === 'garages'" x-transition>
+          <div x-data="garagesView()"></div>
+        </div>
+        
+        <!-- Bikes View -->
+        <div id="bikes-view" x-show="currentView === 'bikes'" x-transition>
+          <div x-data="bikesView()"></div>
+        </div>
+        
+        <!-- Single Bike View -->
+        <div id="bike-view" x-show="currentView === 'bike'" x-transition>
+          <div x-data="bikeDetailView(selectedBikeId)"></div>
+        </div>
+        
+        <!-- Sections View -->
+        <div id="sections-view" x-show="currentView === 'sections'" x-transition>
+          <div x-data="sectionsView(selectedBikeId)"></div>
+        </div>
+        
+        <!-- Parts View -->
+        <div id="parts-view" x-show="currentView === 'parts'" x-transition>
+          <div x-data="partsView(selectedSectionId)"></div>
+        </div>
+        
+        <!-- Maintenance View -->
+        <div id="maintenance-view" x-show="currentView === 'maintenance'" x-transition>
+          <div x-data="maintenanceView()"></div>
+        </div>
+        
+        <!-- Tags View -->
+        <div id="tags-view" x-show="currentView === 'tags'" x-transition>
+          <div x-data="tagsView()"></div>
+        </div>
+        
+        <!-- Search Results View -->
+        <div id="search-view" x-show="currentView === 'search'" x-transition>
+          <div x-data="searchResultsView(searchQuery)"></div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Modal containers -->
+  <div class="modal-container" 
+       x-show="showModal" 
+       x-transition.opacity
+       @click="showModal = false">
+    <div class="modal" @click.stop>
+      <div class="modal-header">
+        <h2 x-text="modalTitle"></h2>
+        <button @click="showModal = false" class="modal-close">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-content" x-html="modalContent"></div>
+    </div>
+  </div>
+
+  <!-- Toast notifications -->
+  <div class="toast-container">
+    <template x-for="(toast, index) in toasts" :key="index">
+      <div class="toast" 
+           :class="toast.type" 
+           x-transition:enter="slide-in"
+           x-transition:leave="slide-out">
+        <div class="toast-content">
+          <i class="fas" :class="getToastIcon(toast.type)"></i>
+          <span x-text="toast.message"></span>
+        </div>
+        <button @click="removeToast(index)" class="toast-close">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </template>
+  </div>
+
+  <!-- JavaScript -->
+  <script src="js/api.js"></script>
+  <script src="js/components/header.js"></script>
+  <script src="js/components/sidebar.js"></script>
+  <script src="js/components/tags.js"></script>
+  <script src="js/views/dashboard.js"></script>
+  <script src="js/views/garages.js"></script>
+  <script src="js/views/bikes.js"></script>
+  <script src="js/views/sections.js"></script>
+  <script src="js/views/parts.js"></script>
+  <script src="js/views/maintenance.js"></script>
+  <script src="js/views/tags.js"></script>
+  <script src="js/views/search.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
